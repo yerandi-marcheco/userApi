@@ -11,12 +11,65 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
+use OpenApi\Annotations as OA;
 
 class UserController extends AbstractController
 {
     use RequestValidationTrait;
-
-    #[Route('/users', name: 'users', methods: 'GET')]
+    /**
+     * This API endpoint retrieves a list of users from the system. It allows you to fetch multiple user records at once, providing useful information about each user.
+     *
+     * @Route("/api/v1/users", methods={"GET"})
+     * @OA\Response(
+     *     response=200,
+     *     description="List of users",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref=@Model(type=User::class, groups={"full"}))
+     *     )
+     * )
+     * @OA\Parameter(
+     *     name="is_active",
+     *     in="query",
+     *     description="Is the user is active or not",
+     *     @OA\Schema(type="boolean")
+     * )
+     * @OA\Parameter(
+     *     name="is_member",
+     *     in="query",
+     *     description="Is the user is member or not",
+     *     @OA\Schema(type="boolean")
+     * )
+     * @OA\Parameter(
+     *     name="last_login_at",
+     *     in="query",
+     *     description="Last time the user logged in to the application",
+     *     @OA\Schema(type="string"),
+     *     example="2020-12-12 to 2022-12-12"
+     * )
+     * @OA\Parameter(
+     *     name="user_type",
+     *     in="query",
+     *     description="User type, could be 1, 2 or 3",
+     *     @OA\Schema(type="string"),
+     *     example="1"
+     * )
+     * @OA\Parameter(
+     *     name="pagination",
+     *     in="query",
+     *     description="The number of user to fetch per page",
+     *     @OA\Schema(type="string")
+     * )
+     * @OA\Parameter(
+     *     name="page",
+     *     in="query",
+     *     description="The number of page to fetch",
+     *     @OA\Schema(type="string")
+     * )
+     * @OA\Tag(name="users")
+     */
     public function index(Request $request, UserRepository $userRepository, UserResource $userResource): JsonResponse
     {
         $this->validateRequest($request);
