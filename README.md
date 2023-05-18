@@ -9,35 +9,5 @@
 
 ### API Documentation:
 
-Request Example:
+* [API Documentation](http://127.0.0.1:8002/api/doc)
 
-`curl --location 'http://localhost:8002/users?is_active=true&is_member=false&user_type=2&last_login_at=2020-12-12%20to%202022-12-12'`
-
-Response Example:
-
-`{
-    "data": [
-        {
-            "id": 328,
-            "username": "test_328_user",
-            "email": "test_328@tnc.com",
-            "is_member": true,
-            "is_active": true,
-            "user_type": 1,
-            "last_login_at": "2020-10-20 20:07:33"
-        },
-    ],
-    "meta": 
-    {
-        "total": 9,
-        "per_page": 10,
-        "current_page": 1,
-        "last_page": 1
-    }
-}`
-
-### API Query Parameters:
-* is_active: true/false,
-* is_member: true/false,
-* user_type: 1/2/3,
-* last_login_at: 2020-12-12 to 2022-12-12

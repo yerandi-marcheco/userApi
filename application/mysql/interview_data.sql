@@ -1,8 +1,8 @@
 
 
-CREATE DATABASE IF NOT EXISTS  `users_test` DEFAULT CHARACTER SET utf8 COLLATE utf8_bin ;
+CREATE DATABASE IF NOT EXISTS  `users` DEFAULT CHARACTER SET utf8 COLLATE utf8_bin ;
 
-USE `users_test`;
+USE `users`;
 
 --
 -- Table structure for table `test_users`
