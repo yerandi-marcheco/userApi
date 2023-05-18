@@ -14,6 +14,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use OpenApi\Annotations as OA;
+use Psr\Cache\CacheItemPoolInterface;
 
 class UserController extends AbstractController
 {
@@ -70,8 +71,9 @@ class UserController extends AbstractController
      * )
      * @OA\Tag(name="users")
      */
-    public function index(Request $request, UserRepository $userRepository, UserResource $userResource): JsonResponse
+    public function index(Request $request, UserRepository $userRepository, UserResource $userResource, CacheItemPoolInterface $cache): JsonResponse
     {
+        $userList = [];
         $this->validateRequest($request);
         $pagination = $request->query->getInt('pagination', 10);
         $page = $request->query->getInt('page', 1);
@@ -83,13 +85,33 @@ class UserController extends AbstractController
         ];
 
         try {
-            $users = $userRepository->findByFilters($filters);
-            $mappedUsers = array_map(fn(User $user) => $userResource->toArray($user), $users);
-            $totalUsers = $userRepository->countByFilters($filters);
+            $cacheKey = $userRepository->getCacheKey($filters, $page, $pagination);
+            $cacheItem = $cache->getItem($cacheKey);
 
-            return $this->json(Response::toArray($mappedUsers, $totalUsers, $pagination, $page));
+            if ($cacheItem->isHit()) {
+                $cachedData = $cacheItem->get();
+                $userList = $cachedData['users'];
+                $totalUsers = $cachedData['totalUsers'];
+                $pagination = $cachedData['pagination'];
+                $page = $cachedData['page'];
+            } else {
+                $users = $userRepository->findByFilters($filters);
+                $userList = array_map(fn(User $user) => $userResource->toArray($user), $users);
+                $totalUsers = $userRepository->countByFilters($filters);
+
+                $cacheItem = $cache->getItem($cacheKey);
+                $cacheItem->set([
+                    'users' => $userList,
+                    'totalUsers' => $totalUsers,
+                    'pagination' => $pagination,
+                    'page' => $page,
+                ]);
+                $cacheItem->expiresAfter($userRepository::ONE_HOUR_CACHE);
+                $cache->save($cacheItem);
+            }
+
+            return $this->json(Response::toArray($userList, $totalUsers, $pagination, $page));
         } catch (\Exception $e) {
-            dd($e);
             //TODO: Log error and return a generic response
             return $this->json(['error' => $e->getMessage()], 500);
         }

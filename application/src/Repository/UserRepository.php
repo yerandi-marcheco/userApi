@@ -18,6 +18,9 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class UserRepository extends ServiceEntityRepository
 {
+    private $cacheKey = 'user_list';
+    public const ONE_HOUR_CACHE = 3600;
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, User::class);
@@ -69,6 +72,13 @@ class UserRepository extends ServiceEntityRepository
         return (int) $queryBuilder->select('COUNT(u.id)')
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    public function getCacheKey(array $filters, int $page, int $pagination): string
+    {
+        $filtersKeys = implode('_', $filters);
+
+        return $this->cacheKey .= "-$filtersKeys-$page-$pagination";
     }
 
     private function setFilters(&$queryBuilder, array $filters): void
