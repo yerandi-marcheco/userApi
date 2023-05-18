@@ -16,15 +16,42 @@ trait RequestValidationTrait
         $validator = Validation::createValidator();
         $filters = $request->query->all();
 
-        $isActive = filter_var($request->query->get('is_active'), FILTER_VALIDATE_BOOLEAN);
-        $isMember = filter_var($request->query->get('is_member'), FILTER_VALIDATE_BOOLEAN);
-        $filters = array_merge($filters, ['is_active' => $isActive, 'is_member' => $isMember]);
+        if ($request->query->get('is_active') !== null) {
+            $isActive = filter_var($request->query->get('is_active'), FILTER_VALIDATE_BOOLEAN);
+            $filters = array_merge($filters, ['is_active' => $isActive]);
+        }
+
+        if ($request->query->get('is_member') !== null) {
+            $isMember = filter_var($request->query->get('is_member'), FILTER_VALIDATE_BOOLEAN);
+            $filters = array_merge($filters, ['is_member' => $isMember]);
+        }
+
+        if ($request->query->get('pagination') !== null) {
+            $pagination = filter_var($request->query->get('pagination'), FILTER_VALIDATE_INT);
+            $filters = array_merge($filters, ['pagination' => $pagination]);
+        }
+
+        if ($request->query->get('page') !== null) {
+            $page = filter_var($request->query->get('user_type'), FILTER_VALIDATE_INT);
+            $filters = array_merge($filters, ['user_type' => $page]);
+        }
 
         $constraints = new Assert\Collection([
             'is_active' => new Assert\Optional(new Assert\Type(['type' => 'bool'])),
             'is_member' => new Assert\Optional(new Assert\Type(['type' => 'bool'])),
             'last_login_at' => new Assert\Optional(new Assert\Type(['type' => 'string'])),
-            'user_type' => new Assert\Optional(new Assert\Choice(['choices' => ['1', '2', '3']]))
+            'user_type' => new Assert\Optional(new Assert\Choice(['choices' => ['1', '2', '3']])),
+            'pagination' => new Assert\Optional([new Assert\Type(['type' => 'int']),]),
+            'page' => new Assert\Optional([
+                new Assert\Type(['type' => 'int']),
+                new Assert\Callback(function ($value, $context) {
+                    if ($value <= 0) {
+                        $context->buildViolation('Page must be an integer greater than 0.')
+                            ->atPath('page')
+                            ->addViolation();
+                    }
+                }),
+            ]),
         ]);
 
         $violations = $validator->validate($filters, $constraints);

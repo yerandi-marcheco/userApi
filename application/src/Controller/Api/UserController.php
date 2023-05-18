@@ -36,6 +36,7 @@ class UserController extends AbstractController
 
             return $this->json(Response::toArray($mappedUsers, $totalUsers, $pagination, $page));
         } catch (\Exception $e) {
+            dd($e);
             //TODO: Log error and return a generic response
             return $this->json(['error' => $e->getMessage()], 500);
         }
