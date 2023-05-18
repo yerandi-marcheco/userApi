@@ -10,7 +10,7 @@ class UserControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $client->request('GET', '/users?is_active=1');
+        $client->request('GET', '/api/v1/users?is_active=1');
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertJson($client->getResponse()->getContent());
@@ -20,7 +20,7 @@ class UserControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $client->request('GET', '/users?is_member=1');
+        $client->request('GET', '/api/v1/users?is_member=1');
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertJson($client->getResponse()->getContent());
@@ -30,7 +30,7 @@ class UserControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $client->request('GET', '/users?last_login_at=2020-12-12 to 2022-12-12');
+        $client->request('GET', '/api/v1/users?last_login_at=2020-12-12 to 2022-12-12');
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertJson($client->getResponse()->getContent());
@@ -40,7 +40,7 @@ class UserControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $client->request('GET', '/users?user_type=1');
+        $client->request('GET', '/api/v1/users?user_type=1');
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertJson($client->getResponse()->getContent());
@@ -50,7 +50,7 @@ class UserControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $client->request('GET', '/users', ['page' => 2, 'limit' => 10]);
+        $client->request('GET', '/api/v1/users', ['page' => 2, 'limit' => 10]);
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());
 
@@ -63,7 +63,7 @@ class UserControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $client->request('GET', '/users', ['page' => 0, 'limit' => 10]);
+        $client->request('GET', '/api/v1/users', ['page' => 0, 'limit' => 10]);
 
         $this->assertSame(400, $client->getResponse()->getStatusCode());
     }

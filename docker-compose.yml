@@ -13,6 +13,9 @@ services:
             - MYSQL_ROOT_PASSWORD=root
         ports:
             - '8084:3306'
+        networks:
+            api_network:
+                ipv4_address: 172.20.0.2
 
     webserver:
         image: 'nginx:alpine'
@@ -29,3 +32,9 @@ services:
         volumes:
             - '.:/application'
             - './phpdocker/php-fpm/php-ini-overrides.ini:/etc/php/8.1/fpm/conf.d/99-overrides.ini'
+networks:
+    api_network:
+        ipam:
+            driver: default
+            config:
+                - subnet: 172.20.0.0/16
